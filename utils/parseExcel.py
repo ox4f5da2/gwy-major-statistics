@@ -42,24 +42,26 @@ def parseM(column_M_data):
 
 def parseQ(column_Q_data):
   if "三级专业目录" in column_Q_data:
-    matches = re.findall(r"要求为：(.*+)", column_Q_data)
-    # 使用正则表达式匹配出需要的内容
-    matches = re.findall(r"三级专业目录(.*?类)：不限|([^\s]+)", matches[0])
+    column_Q_data_list = column_Q_data.split('；')
     result = []
-    for (val1, val2) in matches:
-      if val1 != '' and val1 != '或者':
-        result.append(val1)
-      if val2 != '' and val2 != '或者':
-        result.append(val2)
-    return result
-  elif "不限" in column_Q_data:
+    for Q_str in column_Q_data_list:
+      matches = re.findall(r"要求为：(.*+)", Q_str)
+      # 使用正则表达式匹配出需要的内容
+      matches = re.findall(r"三级专业目录(.*?类)：不限|([^\s]+)", matches[0])
+      for (val1, val2) in matches:
+        if val1 != '' and val1 != '或者':
+          result.append(val1)
+        if val2 != '' and val2 != '或者':
+          result.append(val2)
+    return list(set(result))
+  elif "不限" == column_Q_data:
     return ["不限"]
   else:
     match = re.search(r"：(.+)", column_Q_data)
     if match:
       # 获取冒号后的文字部分
       requirements_text = match.group(1)
-      return [s.strip() for s in requirements_text.split("或者")]
+      return list(set([s.strip() for s in requirements_text.split("或者")]))
     else:
       return []
 

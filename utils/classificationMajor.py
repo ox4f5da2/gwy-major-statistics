@@ -21,27 +21,34 @@ def initial_val(dict, keys):
       children.append(dict)
 
 
-def get_classification_major(dict):
+def get_classification_major(dict, no_limit_val):
   major_dict = {
-    "val": 0,
     "name": "all",
+    "val": no_limit_val,
     "children": []
   }
   for key, value in dict.items():
     initial_val(major_dict, [key] + value)
-  
   return major_dict
+
+
+def add_leaf_child(data, val):
+  if len(data["children"]) == 0:
+    data["val"] += val
+    return
+  for child in data["children"]:
+    add_leaf_child(child, val)
 
 
 def add_val(dict, path, val):
   for key in path[::-1]:
     result = find_dict_by_name(dict["children"], key)
-    result["val"] += val
     dict = result
+  dict["val"] += val
 
 
 def count(major_dict, result):
-  count_dict = get_classification_major(major_dict)
+  count_dict = get_classification_major(major_dict, result["不限"])
   for key, value in result.items():
     paths = [key] + major_dict.get(key, [])
     add_val(count_dict, paths, value)
